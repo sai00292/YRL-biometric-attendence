@@ -1,0 +1,150 @@
+// Data Mocking Simulation database
+const dummyUsers = [
+    { id: "EMP-0412", name: "Ananya Mishra", type: "IN" },
+    { id: "EMP-0895", name: "Rahul Verma", type: "IN" },
+    { id: "EMP-0233", name: "Sai Sandeep", type: "IN" },
+    { id: "EMP-0714", name: "Kavitha Rao", type: "OUT" }
+];
+
+// Document Elements
+const scannerZone = document.getElementById('scanner-zone');
+const scannerIcon = document.getElementById('scanner-icon');
+const displayPanel = document.getElementById('display-panel');
+const logTableBody = document.getElementById('log-table-body');
+const statusDot = document.querySelector('.status-dot');
+const statusText = document.querySelector('.status-text');
+
+// Menu Mode Switching elements
+const btnFingerprint = document.getElementById('btn-fingerprint');
+const btnFace = document.getElementById('btn-face');
+const scanInstruction = document.getElementById('scan-instruction');
+
+let currentMode = 'fingerprint';
+let isScanning = false;
+
+// 1. Live Dynamic Clock Setup
+function updateClock() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', options);
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// 2. Hardware Mode Swapper (Fingerprint vs Face)
+btnFingerprint.addEventListener('click', () => switchMode('fingerprint', 'fa-fingerprint', 'Place your finger on the scanner or click to simulate'));
+btnFace.addEventListener('click', () => switchMode('face', 'fa-user-shield', 'Position your face in front of the camera or click to simulate'));
+
+function switchMode(mode, iconClass, text) {
+    if (isScanning) return;
+    currentMode = mode;
+    btnFingerprint.classList.toggle('active', mode === 'fingerprint');
+    btnFace.classList.toggle('active', mode === 'face');
+    scannerIcon.className = `fa-solid ${iconClass}`;
+    scanInstruction.innerText = text;
+}
+
+// 3. Scan Hardware Simulation Event Handler
+scannerZone.addEventListener('click', () => {
+    if (isScanning) return; // Prevent double-triggering while running
+    
+    isScanning = true;
+    scannerZone.classList.add('scanning');
+    statusDot.className = 'status-dot scanning';
+    statusText.innerText = 'Verifying Biometrics...';
+    
+    // Set UI window status panel to processing state
+    displayPanel.innerHTML = `
+        <div class="processing-state">
+            <p style="color: var(--accent-color); font-weight: 600;">Reading Template...</p>
+            <p style="font-size:0.85rem; color:var(--text-muted)">Do not move</p>
+        </div>
+    `;
+
+    // Simulate Hardware validation latency delay (2 Seconds)
+    setTimeout(() => {
+        processScanResult();
+    }, 2000);
+});
+
+// 4. Processing Output Generation and Log Pipeline
+function processScanResult() {
+    isScanning = false;
+    scannerZone.classList.remove('scanning');
+    statusDot.className = 'status-dot online';
+    statusText.innerText = 'Scanner Online';
+
+    // 5% chance of structural verification reject match error simulation
+    const isSuccess = Math.random() > 0.05;
+
+    if (isSuccess) {
+        // Randomly pick an employee from our dataset
+        const randomUser = dummyUsers[Math.floor(Math.random() * dummyUsers.length)];
+        const scanTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        // Display Success Card Panel UI
+        displayPanel.innerHTML = `
+            <div class="result-profile">
+                <div class="profile-avatar success">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <h4>${randomUser.name}</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 5px;">${randomUser.id}</p>
+                <span class="badge ${randomUser.type.toLowerCase()}">Punch ${randomUser.type}</span>
+                <p style="color: var(--accent-success); font-weight: 600; margin-top: 8px; font-size: 0.9rem;">Verification Successful</p>
+            </div>
+        `;
+
+        // Feed log data pipeline forward into row tracking elements
+        addLogToTable(randomUser.id, randomUser.name, scanTime, randomUser.type, 'Success');
+    } else {
+        // Handle rejection state window setup
+        displayPanel.innerHTML = `
+            <div class="result-profile">
+                <div class="profile-avatar error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h4>Access Denied</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted)">Unknown Template Profile Match</p>
+                <p style="color: var(--accent-error); font-weight: 600; margin-top: 8px; font-size: 0.9rem;">Please Try Again</p>
+            </div>
+        `;
+    }
+
+    // Return application to standard default listening mode loop after timeout display window closes
+    setTimeout(() => {
+        if (!isScanning) {
+            displayPanel.innerHTML = `
+                <div class="idle-state">
+                    <i class="fa-solid fa-id-card-clip"></i>
+                    <p>Ready for authentication</p>
+                </div>
+            `;
+        }
+    }, 4000);
+}
+
+function addLogToTable(id, name, time, type, status) {
+    const row = document.createElement('tr');
+    row.style.animation = 'fadeIn 0.5s ease-out';
+    row.innerHTML = `
+        <td><strong>${id}</strong></td>
+        <td>${name}</td>
+        <td>${time}</td>
+        <td><span class="badge ${type.toLowerCase()}">${type}</span></td>
+        <td style="color: var(--accent-success); font-weight: 500;"><i class="fa-solid fa-circle-check"></i> ${status}</td>
+    `;
+    
+    // Insert new check-in records systematically at the top row placement
+    if (logTableBody.firstChild) {
+        logTableBody.insertBefore(row, logTableBody.firstChild);
+    } else {
+        logTableBody.appendChild(row);
+    }
+}
+
+// Generate some initial seed logs on interface initialization
+window.addEventListener('DOMContentLoaded', () => {
+    addLogToTable("EMP-0412", "Ananya Mishra", "09:15 AM", "IN", "Success");
+    addLogToTable("EMP-0714", "Kavitha Rao", "12:30 PM", "OUT", "Success");
+});
