@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biometric Attendance System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-fingerprint"></i>
+                <h2>BioTime</h2>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="active"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a href="#"><i class="fa-solid fa-user-check"></i> Attendance</a>
+                <a href="#"><i class="fa-solid fa-users"></i> Employees</a>
+                <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="header-title">
+                    <h1>Biometric Terminal</h1>
+                    <p id="current-date">Loading date...</p>
+                </div>
+                <div class="system-status">
+                    <span class="status-dot online"></span>
+                    <span class="status-text">Scanner Online</span>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <section class="card scanner-card">
+                    <h3>Device Scanner</h3>
+                    <div class="scanner-container" id="scanner-zone">
+                        <div class="scan-target">
+                            <i id="scanner-icon" class="fa-solid fa-fingerprint"></i>
+                            <div class="laser-line"></div>
+                        </div>
+                        <p id="scan-instruction">Place your finger on the scanner or click to simulate</p>
+                    </div>
+                    <div class="scan-actions">
+                        <button id="btn-fingerprint" class="btn active">Fingerprint</button>
+                        <button id="btn-face" class="btn">Face ID</button>
+                    </div>
+                </section>
+
+                <section class="card status-card">
+                    <h3>Terminal Status</h3>
+                    <div class="display-panel" id="display-panel">
+                        <div class="idle-state">
+                            <i class="fa-solid fa-id-card-clip"></i>
+                            <p>Ready for authentication</p>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <section class="card logs-section">
+                <h3>Recent Attendance Logs</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="log-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
